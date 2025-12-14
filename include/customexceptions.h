@@ -8,33 +8,33 @@
 #ifndef CUSTOMEXCEPTIONS_H
 #define CUSTOMEXCEPTIONS_H
 
-class vectorError : public std::exception 
+//---------------PARENTS----------------
+
+class mathError : public std::exception
 {
     private:
     std::string message;
 
     public:
-    vectorError( const std::string& msg ) : message( msg ) { }
-
     const char* what() const noexcept override {
         return message.c_str( );
     }
 };
 
-class dimSizeError : public std::exception 
+class dimError : public std::exception
 {
     private:
     std::string message;
 
     public:
-    dimSizeError( const std::string& msg ) : message( msg ) { }
-
     const char* what() const noexcept override {
         return message.c_str( );
     }
 };
 
-class solutionError : public std::exception 
+//---------------CHILD MATH ERRORS----------------
+
+class solutionError : public mathError
 {
     private:
     std::string message;
@@ -47,7 +47,7 @@ class solutionError : public std::exception
     }
 };
 
-class statsError : public std::exception 
+class statsError : public mathError
 {
     private:
     std::string message;
@@ -60,7 +60,7 @@ class statsError : public std::exception
     }
 };
 
-class realError : public std::exception 
+class realError : public mathError
 {
     private:
     std::string message;
@@ -72,5 +72,34 @@ class realError : public std::exception
         return message.c_str( );
     }
 };
+
+//--------------CHILD DIM ERRORS----------------
+
+class vectDimError : public std::exception 
+{
+    private:
+    std::string message;
+
+    public:
+    vectDimError( const std::string& msg ) : message( msg ) { }
+
+    const char* what() const noexcept override {
+        return message.c_str( );
+    }
+};
+
+class matrixDimError : public dimError
+{
+    private:
+    std::string message;
+
+    public:
+    matrixDimError( const std::string& msg ) : message( msg ) { }
+
+    const char* what() const noexcept override {
+        return message.c_str( );
+    }
+};
+
 
 #endif
