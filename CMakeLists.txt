@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 3.28)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -43,37 +43,45 @@ include_directories(${ACPP_BINARY_ROOT} ${ACPP_SOURCE_ROOT})
 # --------------------libraries--------------------
 
 # vect library
-add_library(vect_lib)
-target_sources(vect_lib
-    PRIVATE
-        src/vect.cpp
-    PUBLIC
-        FILE_SET HEADERS
-        BASE_DIRS
-            include
-        FILES
-            include/vect.h
-            include/customexceptions.h
+add_library(vect_lib INTERFACE)
+target_include_directories(vect_lib
+    INTERFACE
+        include/vect
+        include/shared_util
+        sycl
+        
 )
 
-add_executable(vectTest)
-target_sources(vectTest
+
+#target_sources(vect_lib
+#    PRIVATE
+#        src/vect.cpp
+#    PUBLIC
+#        FILE_SET HEADERS
+#        BASE_DIRS
+#            include
+#        FILES
+#            include/vect.h
+#            include/customexceptions.h
+#)
+
+add_executable(VECT--TEST)
+target_sources(VECT--TEST
     PRIVATE
-        tests/vectTest.cpp
+        tests/VECT--TEST.cpp
 )
 
-target_link_libraries(vectTest
+target_link_libraries(VECT--TEST
     PRIVATE
         vect_lib
 )
 
 add_test(
-    NAME vectTest
-    COMMAND vectTest
+    NAME VECT--TEST
+    COMMAND VECT--TEST
 )
 
-add_sycl_to_target(TARGET vectTest)
-add_sycl_to_target(TARGET vect_lib)
+add_sycl_to_target(TARGET VECT--TEST)
 
 #[[
 
