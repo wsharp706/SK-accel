@@ -43,6 +43,16 @@ namespace SKAS::util
     {
         return [aavg]( T1 ai ) { return (ai-aavg)*(ai-aavg); };
     }
+
+    //used in matrix.h for operator%()
+    
+    /*
+    template < SKAS::FlAd T >
+    auto ptrdot( const std::iterator< T > beginFirst, const std::iterator< T > endFirst, const std::iterator< T > beginSecond )
+    {
+        
+    }
+    */
 };
 
 

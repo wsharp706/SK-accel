@@ -46,25 +46,25 @@ include_directories(${ACPP_BINARY_ROOT} ${ACPP_SOURCE_ROOT})
 add_library(vect_lib INTERFACE)
 target_include_directories(vect_lib
     INTERFACE
-        include/vect
-        include/shared_util
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/vect
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/shared_util
         sycl
         
 )
 
+# matrix library
+add_library(matrix_lib INTERFACE)
+target_include_directories(matrix_lib
+    INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/vect
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/matrix
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/shared_util
+        sycl
+)
 
-#target_sources(vect_lib
-#    PRIVATE
-#        src/vect.cpp
-#    PUBLIC
-#        FILE_SET HEADERS
-#        BASE_DIRS
-#            include
-#        FILES
-#            include/vect.h
-#            include/customexceptions.h
-#)
+# ------------------tests------------------------
 
+# vect testing
 add_executable(VECT--TEST)
 target_sources(VECT--TEST
     PRIVATE
@@ -82,6 +82,45 @@ add_test(
 )
 
 add_sycl_to_target(TARGET VECT--TEST)
+
+# matrix testing
+add_executable(MATRIX--TEST)
+target_sources(MATRIX--TEST
+    PRIVATE
+        tests/MATRIX--TEST.cpp
+)
+
+target_link_libraries(MATRIX--TEST
+    PRIVATE
+        matrix_lib
+)
+
+add_test(
+    NAME MATRIX--TEST
+    COMMAND MATRIX--TEST
+)
+
+add_sycl_to_target(TARGET MATRIX--TEST)
+
+# timings
+add_executable(TIMINGS)
+target_sources(TIMINGS
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/TIMINGS.cpp
+)
+
+target_link_libraries(TIMINGS
+    PUBLIC
+        matrix_lib
+        
+)
+
+add_test(
+    NAME TIMINGS
+    COMMAND TIMINGS
+)
+
+add_sycl_to_target(TARGET TIMINGS)
 
 #[[
 

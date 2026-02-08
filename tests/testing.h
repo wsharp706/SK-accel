@@ -33,7 +33,7 @@ auto expectT( std::string message, const T& obj_1, const T& obj_2 ) -> void
     else
     {
         std::cout << "\033[31m[<][>][<][>][<]    FAILED    [>][<][>][<][>]\033[0m" << std::endl;
-        std::cout << "\033[91m | obj_1 = " << obj_1 << " |\n | obj_2 = " << obj_2 << " |\033[0m" << std::endl;
+        std::cout << "\033[91m | obj_1 = \n" << obj_1 << " |\n\n | obj_2 = \n" << obj_2 << " |\033[0m" << std::endl;
         throw TESTFAILURE{ "\033[31m" + message + " -> FAILED: ARE NOT EQUAL.\033[0m" };
     }
 }
@@ -49,7 +49,7 @@ auto expectF( std::string message, const T& obj_1, const T& obj_2 ) -> void
     else
     {
         std::cout << "\033[31m[<][>][<][>][<]    FAILED    [>][<][>][<][>]\033[0m" << std::endl;
-        std::cout << "\033[91m | obj_1 = " << obj_1 << " |\n | obj_2 = " << obj_2 << " |\033[0m" << std::endl;
+        std::cout << "\033[91m | obj_1 = \n" << obj_1 << " |\n\n| obj_2 = \n" << obj_2 << " |\033[0m" << std::endl;
         throw TESTFAILURE{ "\033[31m" + message + " -> FAILED: ARE EQUAL.\033[0m" };
     }
 }

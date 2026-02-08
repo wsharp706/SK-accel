@@ -51,11 +51,24 @@ namespace SKAS::vect
             interior = t_interior;
             parallel = parallel;
         }
+
+        vect( const size_t dim, const T init_value, bool parallel = false )
+        {
+            std::vector< T > t_interior( dim, init_value );
+            interior = t_interior;
+            parallel = parallel;
+        }
         
         vect( const std::vector< T >& orig, const bool& par ) : parallel( false )
         {
             interior = orig;
             parallel = par;
+        }
+
+        vect( const std::vector< T >& orig ) : parallel( false )
+        {
+            interior = orig;
+            parallel = false;
         }
 
         vect& operator=( const vect& other )
@@ -65,6 +78,13 @@ namespace SKAS::vect
                 interior = other.interior;
                 parallel = other.parallel;
             }
+            return *this;
+        }
+
+        vect& operator=( const std::vector< T >& other )
+        {
+            interior = other;
+            parallel = false;
             return *this;
         }
 
@@ -92,6 +112,11 @@ namespace SKAS::vect
         auto size( ) const -> size_t
         {
             return interior.size( );
+        }
+
+        auto erase( std::vector< T >::iterator first, std::vector< T >::iterator last ) -> void
+        {
+            interior.erase( first, last );
         }
 
         auto begin( ) -> std::vector< T >::iterator
@@ -287,6 +312,7 @@ namespace SKAS::vect
     template < SKAS::FlAd T1, SKAS::FlAd T2 >
     auto operator*( const vect< T1 >& t_vec, const T2& scalar ) -> vect< T1 >
     {
+        if ( t_vec.is_parallel( ) ) return accel_vect::PV_scale< T1 >( t_vec, scalar );
         vect< T1 > output( t_vec.size( ), false );
         size_t i = 0;
         for ( const auto &elem : t_vec.interior )
@@ -306,7 +332,7 @@ namespace SKAS::vect
     template < SKAS::FlAd T1, SKAS::FlAd T2 >
     auto operator*( const vect< T1 >& first, const vect< T2 >& last ) -> T1
     {
-        //if ( first.is_parallel( ) && last.is_parallel( ) ) return accel_vect::PV_dot( first, last );
+        if ( first.is_parallel( ) && last.is_parallel( ) ) return accel_vect::PV_dot( first, last );
         if( first.size( ) != last.size( ) )
         {
             throw vectDimError{"CANNOT DOT PRODUCT VECTORS OF DIFFERENT DIMENSION!"};
@@ -327,7 +353,7 @@ namespace SKAS::vect
     template < SKAS::FlAd T1 >
     auto mag( const vect< T1 >& t_vec ) -> T1
     {
-        //if ( t_vec.is_parallel( ) ) return accel_vect::PV_mag( t_vec );
+        if ( t_vec.is_parallel( ) ) return accel_vect::PV_mag( t_vec );
         double sum = 0;
         for ( auto &elem : t_vec.interior )
         {
@@ -615,26 +641,24 @@ namespace SKAS::vect::accel_vect
 
     
     template < SKAS::FlAd T1 >
-    auto PV_scale( const vect< T1 >& a, const T1 scalar ) -> vect< T1 >
+    auto PV_scale( const SKAS::vect::vect< T1 >& a, const T1 scalar ) -> vect< T1 >
     {
         sycl::queue q = gpu::ctx( ).q;
 
         vect< T1 > c( a.size( ), true );
 
         T1* dev_a = sycl::malloc_device< T1 >( a.size( ), q );
-        T1* dev_c = sycl::malloc_device< T1 >( a.size( ), q );
 
         q.memcpy( dev_a, a.data( ), sizeof( T1 ) * a.size( ) );
 
-        auto f = util::make_multiplier( scalar );
+        auto f = util::make_multiplier< T1, T1 >( scalar );
 
-        hipsycl::algorithms::for_each( q, dev_a, dev_a + a.size( ), f );
+        hipsycl::algorithms::transform( q, dev_a, dev_a + a.size( ), dev_a, f );
 
-        q.memcpy( c.data( ), dev_c, sizeof( T1 ) * c.size( ) );
+        q.memcpy( c.data( ), dev_a, sizeof( T1 ) * c.size( ) );
         q.wait( );
 
         sycl::free( dev_a, q );
-        sycl::free( dev_c, q );
 
         return c;
     }
