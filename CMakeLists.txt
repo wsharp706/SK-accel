@@ -1,8 +1,128 @@
-cmake_minimum_required(VERSION 4.2)
-project(LinAlg)
+cmake_minimum_required(VERSION 3.28)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+project(rigMath-UTIL)
+
+# --------------------dependencies-------------------
+
 include(CTest)
+find_package(AdaptiveCpp CONFIG REQUIRED)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ACPP_SOURCE_ROOT}/cmake)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+if(NOT ACPP_DEBUG_LEVEL)
+  if(CMAKE_BUILD_TYPE MATCHES "Debug")
+    set(ACPP_DEBUG_LEVEL 3 CACHE STRING
+      "Choose the debug level, options are: 0 (no debug), 1 (print errors), 2 (also print warnings), 3 (also print general information)"
+FORCE)
+  else()
+    set(ACPP_DEBUG_LEVEL 2 CACHE STRING
+      "Choose the debug level, options are: 0 (no debug), 1 (print errors), 2 (also print warnings), 3 (also print general information)"
+FORCE)
+  endif()
+endif()
+
+#add_compile_definitions(HIPSYCL_DEBUG_LEVEL="${HIPSYCL_DEBUG_LEVEL}")
+#Use add_definitions for now for older cmake versions
+cmake_policy(SET CMP0005 NEW)
+add_definitions(-DHIPSYCL_DEBUG_LEVEL=${ACPP_DEBUG_LEVEL})
+
+if(WIN32)
+  add_definitions(-D_USE_MATH_DEFINES)
+endif()
+
+include_directories(${ACPP_BINARY_ROOT} ${ACPP_SOURCE_ROOT})
+
+#subdirs(bruteforce_nbody)
 
 # --------------------libraries--------------------
+
+# vect library
+add_library(vect_lib INTERFACE)
+target_include_directories(vect_lib
+    INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/vect
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/shared_util
+        sycl
+        
+)
+
+# matrix library
+add_library(matrix_lib INTERFACE)
+target_include_directories(matrix_lib
+    INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/vect
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/matrix
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/shared_util
+        sycl
+)
+
+# ------------------tests------------------------
+
+# vect testing
+add_executable(VECT--TEST)
+target_sources(VECT--TEST
+    PRIVATE
+        tests/VECT--TEST.cpp
+)
+
+target_link_libraries(VECT--TEST
+    PRIVATE
+        vect_lib
+)
+
+add_test(
+    NAME VECT--TEST
+    COMMAND VECT--TEST
+)
+
+add_sycl_to_target(TARGET VECT--TEST)
+
+# matrix testing
+add_executable(MATRIX--TEST)
+target_sources(MATRIX--TEST
+    PRIVATE
+        tests/MATRIX--TEST.cpp
+)
+
+target_link_libraries(MATRIX--TEST
+    PRIVATE
+        matrix_lib
+)
+
+add_test(
+    NAME MATRIX--TEST
+    COMMAND MATRIX--TEST
+)
+
+add_sycl_to_target(TARGET MATRIX--TEST)
+
+# timings
+add_executable(TIMINGS)
+target_sources(TIMINGS
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/TIMINGS.cpp
+)
+
+target_link_libraries(TIMINGS
+    PUBLIC
+        matrix_lib
+        
+)
+
+add_test(
+    NAME TIMINGS
+    COMMAND TIMINGS
+)
+
+add_sycl_to_target(TARGET TIMINGS)
+
+#[[
 
 # matrix library
 add_library(matrix_lib)
@@ -69,4 +189,13 @@ target_link_libraries(modelTest
     PRIVATE
         model_lib
 )
+
+add_sycl_to_target( 
+    TARGET 
+        matrixTest    
+)
+
+]]
+
+
 
