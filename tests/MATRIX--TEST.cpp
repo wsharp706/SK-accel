@@ -1,5 +1,5 @@
 /**
- * @brief Vect testing script
+ * @brief Matrix testing script
  */
 #include "vect.h"
 #include "matrix.h"

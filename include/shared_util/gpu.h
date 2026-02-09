@@ -11,9 +11,6 @@
 
 namespace SKAS::gpu
 {
-    /**
-     * @brief information about parallel backend required for some acceleration functions
-     */
     struct gpu_context
     {
         sycl::queue q;

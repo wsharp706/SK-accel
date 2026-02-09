@@ -6,18 +6,19 @@
 
 auto main( ) -> int
 {
+    /*
     std::ofstream outputData;
-    outputData.open("../CPP_PM_TIME.csv");
-    unsigned long int sqdim = 2000;
+    outputData.open("../CPP_PMPlus_TIME.csv");
+    unsigned long int sqdim = 20000;
 
-    for ( int t_dim = 1; t_dim <= sqdim; t_dim += 20 )
+    for ( int t_dim = 1; t_dim <= sqdim; t_dim += 50 )
     {
-        SKAS::matrix::matrix< double > W( 10, t_dim, t_dim, true );
+        SKAS::matrix::matrix< double > W( 0, t_dim, t_dim, true );
         outputData << t_dim << ",";
         //===========
         auto a1start = std::chrono::high_resolution_clock::now();
         //---
-        W % W;
+        W + W;
         //---
         auto a1end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(a1end - a1start).count();
@@ -25,6 +26,7 @@ auto main( ) -> int
         outputData << duration << std::endl;
     }
     outputData.close( );
+    */
     return EXIT_SUCCESS;
 }
     
